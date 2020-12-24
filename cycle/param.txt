@@ -1,0 +1,6 @@
+total_ants = 100
+
+# 蒸発率
+rou = 0.9
+alpha = 5
+beta = 3

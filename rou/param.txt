@@ -1,0 +1,5 @@
+total_cycle = 100
+total_ants = 100
+
+alpha = 5
+beta = 3

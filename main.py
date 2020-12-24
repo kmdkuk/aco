@@ -7,8 +7,8 @@ param_Q = 100
 ant_prob_random = 0.1
 
 # サイクル数
-total_cycle = 500
-total_ants = 1000
+total_cycle = 100
+total_ants = 100
 
 # 蒸発率
 rou = 0.9
@@ -118,8 +118,10 @@ for i in range(total_cycle):
     lengths = []
     for ant in ants:
         # スタート地点の設定
-        ant.m_visited_path.append(0)
-        ant.m_visited_vertex[0] = True
+        # 札幌0 那覇46
+        start = 26
+        ant.m_visited_path.append(start)
+        ant.m_visited_vertex[start] = True
         # アリ１匹のパス構築
         for j in range(46):
             # 現在の頂点

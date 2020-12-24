@@ -1,0 +1,8 @@
+# サイクル数
+total_cycle = 100
+total_ants = 100
+
+# 蒸発率
+rou = 0.9
+alpha = 5
+beta = 3

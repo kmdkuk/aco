@@ -1,0 +1,11 @@
+param_Q = 100
+ant_prob_random = 0.1
+
+# サイクル数
+total_cycle = 500
+total_ants = 1000
+
+# 蒸発率
+rou = 0.9
+alpha = 5
+beta = 3
