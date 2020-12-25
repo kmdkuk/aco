@@ -1,0 +1,286 @@
+\documentclass[11pt,a4paper]{jsarticle}
+%
+\usepackage{amsmath,amssymb}
+\usepackage{bm}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{ascmac}
+%
+\setlength{\textwidth}{\fullwidth}
+\setlength{\textheight}{39\baselineskip}
+\addtolength{\textheight}{\topskip}
+\setlength{\voffset}{-0.5in}
+\setlength{\headsep}{0.3in}
+%
+\newcommand{\divergence}{\mathrm{div}\,}  %ダイバージェンス
+\newcommand{\grad}{\mathrm{grad}\,}  %グラディエント
+\newcommand{\rot}{\mathrm{rot}\,}  %ローテーション
+%
+\markright{\footnotesize \sf 適応システム特論 前半レポート課題 \ }
+
+\begin{document}
+%
+%
+\section*{適応システム特論 前半レポート課題 2119012 鎌田幸希}
+
+\section{実装したモデル}
+
+講義で扱ったモデルとして，今回Ant Colony Optimizationを実装した．講義の動画以外にも，https://qiita.com/ganariya/items/25824f1502478a673005 を参考に今回実装を行った．
+
+\section{実験}
+
+実験には，各都道府県の県庁所在都市の緯度経度をx座標y座標としたときに，すべてのノードを回る距離を最短化するための最適化を行った．
+パラメータごとの結果への影響をまとめるため，以下の項目を変化させ実験を行った．
+結果は，サイクルごとのパスの距離の変化をプロットしたものを図にした．
+
+\begin{itemize}
+  \item サイクル数
+  \item アリの数
+  \item フェロモンの蒸発率
+  \item 開始地点・終端
+  \item 移動時の確率を決定するためのalphaとbeta
+\end{itemize}
+
+基本的なパラメータは，表\ref{param}に示す．
+ant\_prob\_randomは，アリが過学習をすることを防ぐため，次のノードを決める際に完全ランダムにする確率である．
+
+\begin{table}[hb]
+  \caption{シミュレーションパラメータ}
+  \centering
+  \label{param}
+  \begin{tabular}{l|l}
+    \hline
+    パラメータ            & 設定値 \\ \hline
+    サイクル数             & 100 \\
+    アリの数            & 100 \\
+    フェロモンの蒸発率             & 0.9 \\
+    alpha  & 5 \\
+    beta              & 3 \\
+    フェロモン決定の分母Q & 100 \\
+    ant\_prob\_random & 0.1 \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\subsection*{サイクル数}
+
+N体のアリを始点Sから移動させ，パスを構築し，フェロモンの更新を行うまでを一つのサイクルとして扱い．
+これを1，10, 100, 1000回と変化させて実験を行った．
+
+\subsection*{アリの数}
+
+1度にネットワーク上を移動させるアリの数を1,10,100,1000体と変化させて実験を行った．
+
+\subsection*{フェロモンの蒸発率}
+
+フェロモンを更新する際の，前のサイクルまでのフェロモンを残す割合を0.1,0.5,0.9,1.0と変化させて実験を行った．
+
+\subsection*{開始地点・終端}
+
+開始地点・終端となるノードを，札幌，東京，大阪，那覇と変化させて実験を行った．
+
+\subsection*{移動時の確率を決定するためのalphaとbeta}
+
+アリが次のノードを決定する際に，フェロモンとノード間のヒューリスティックどちらを重視するかという値であるalphaとbetaの値を，
+(0,1),(1,0),(1,1),(3,5),(5,3)と変化させて実験を行った．
+
+\section{結果・考察}
+
+\subsection{サイクル数}
+
+図\ref{cycle_10_history}から図\ref{cycle_1000_history}が，総サイクル数を変えたときのサイクルごとのパスの距離の変化を図示したものである．
+確率的な偏りがある可能性があるが，それぞれの最短距離は，63,62,61と変化しており，サイクル数を増やしたときのほうが，より短いパスを算出できている．
+
+\begin{figure*}[htb]
+  \centering
+  \begin{tabular}{ccc}
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{cycle/10/history.png}
+      \caption{サイクル10回時の最短距離の変化}
+      \label{cycle_10_history}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{cycle/100/history.png}
+      \caption{サイクル100回時の最短距離の変化}
+      \label{cycle_100_history}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{cycle/1000/history.png}
+      \caption{サイクル1000回時の最短距離の変化}
+      \label{cycle_1000_history}
+    \end{minipage}
+  \end{tabular}
+\end{figure*}
+
+\subsection{アリの数}
+
+図\ref{ant_1_history}から図\ref{ant_1000_history}がアリの数を1から1000まで変化させたときの，サイクルごとのパスの距離の変化を図示したものである．
+それぞれ最短距離が65,63,62,61と変化しており，より多いアリの数でより短いパスが求められることがわかる．また，多いアリで実行したときのほうが，結果が上振れすることが少なくなっていることもわかる．
+
+\begin{figure*}[htb]
+  \centering
+  \begin{tabular}{ccc}
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{ant/1/history.png}
+      \caption{アリ1体の最短距離の変化}
+      \label{ant_1_history}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{ant/10/history.png}
+      \caption{アリ10体の最短距離の変化}
+      \label{ant_10_history}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{ant/100/history.png}
+      \caption{アリ100体の最短距離の変化}
+      \label{ant_100_history}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{ant/1000/history.png}
+      \caption{アリ1000体の最短距離の変化}
+      \label{ant_1000_history}
+    \end{minipage}
+  \end{tabular}
+\end{figure*}
+
+\subsection{フェロモンの蒸発率}
+
+図\ref{rou_1_history}から図\ref{rou_10_history}がフェロモンの蒸発率を0.1から1.0まで変化させたときのパスの距離の変化を図示したものである．
+それぞれ最短距離は，62,62,62,61となっており，かなり誤差ではあるものの，徐々に最適化されていることがわかる．
+平均的に見ると，0.9,1.0の場合のときが，0.1,0.5のときと比べると上に大きくなく，より良いのではないかと考えられる．
+しかし，1.0だと，前回までのフェロモン値をすべて残すことになり，大きな問題で実行するときにフェロモン値がオーバーフローすることが予想されるため，0.9あたりが最適だと考えられる．
+
+\begin{figure*}[htb]
+  \centering
+  \begin{tabular}{ccc}
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{rou/0.1/history.png}
+      \caption{蒸発率0.1の最短距離の変化}
+      \label{rou_1_history}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{rou/0.5/history.png}
+      \caption{蒸発率0.5の最短距離の変化}
+      \label{rou_5_history}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{rou/0.9/history.png}
+      \caption{蒸発率0.9の最短距離の変化}
+      \label{rou_9_history}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{rou/1/history.png}
+      \caption{蒸発率1.0の最短距離の変化}
+      \label{rou_10_history}
+    \end{minipage}
+  \end{tabular}
+\end{figure*}
+
+\subsection{開始地点・終端}
+
+図\ref{sapporo_history}から図\ref{naha_history}は，それぞれ開始・終端を札幌，東京，大阪，那覇と変えて実行した結果である．
+それぞれ最短距離は，62,61,61,62となっている．グラフを見ると札幌，那覇は，サイクルごとの出力パスの距離の変動が大きいことや，最短距離の僅かな違いを見ると，よりグラフの中央となるような位置から始めると最適解が導きだされやすいと考えることもできる．これに関しては，より細かな検証が必要である．
+
+\begin{figure*}[htb]
+  \centering
+  \begin{tabular}{ccc}
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{start/sapporo/history.png}
+      \caption{札幌からの最短距離の変化}
+      \label{sapporo_history}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{start/tokyo/history.png}
+      \caption{東京からの最短距離の変化}
+      \label{tokyo_history}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{start/osaka/history.png}
+      \caption{大阪からの最短距離の変化}
+      \label{osaka_history}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{start/okinawa/history.png}
+      \caption{沖縄からの最短距離の変化}
+      \label{naha_history}
+    \end{minipage}
+  \end{tabular}
+\end{figure*}
+
+\subsection{移動時の確率を決定するためのalphaとbeta}
+
+図\ref{01_history}から図\ref{53_history}までは，alphaとbetaの値を(0,1),(1,0),(1,1),(3,5),(5,3)と変化させたときの，出力パスのサイクルごとの変化の様子をプロットしたものである．
+それぞれ，最短距離は，122,125,68,62,61となっている．この結果からどちらかの値を0にしてしまうと，全く最適化ができないことがわかる．
+
+\begin{figure*}[htb]
+  \centering
+  \begin{tabular}{ccc}
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{alphabeta/0:1/history.png}
+      \caption{(0,1)の最短距離の変化}
+      \label{01_history}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{alphabeta/1:0/history.png}
+      \caption{(1,0)の最短距離の変化}
+      \label{10_history}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{alphabeta/1:1/history.png}
+      \caption{(1,1)の最短距離の変化}
+      \label{11_history}
+    \end{minipage}
+    \\
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{alphabeta/3:5/history.png}
+      \caption{(3,5)の最短距離の変化}
+      \label{35_history}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \centering
+      \includegraphics[width=50mm]{alphabeta/5:3/history.png}
+      \caption{(5,3)の最短距離の変化}
+      \label{53_history}
+    \end{minipage}
+  \end{tabular}
+\end{figure*}
+
+\section{付録(プログラムなど)}
+
+実験結果の図．出力されたパスを図にしたもの，プログラムをzipの中に同封しました．
+実行環境Python 3.8.3
+%
+%
+\end{document}
